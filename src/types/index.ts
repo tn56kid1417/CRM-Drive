@@ -1,75 +1,118 @@
-export type Role = 'COMPANY_ADMIN' | 'SALES_USER';
-
+// ─── Auth ──────────────────────────────────────────────────────────────────
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: Role;
-  designation?: string;
-  mobile?: string;
-  companyId?: string; // Present for COMPANY_ADMIN and SALES_USER
-  workspaceName?: string;
+  id: string
+  name: string
+  email: string
+  role: 'COMMUNITY_MANAGER'
 }
 
-export type CompanySize = '1–10 Employees' | '11–50 Employees' | '51–100 Employees' | '101–500 Employees' | '500+ Employees';
+// ─── Community Spaces ───────────────────────────────────────────────────────
+export type CommunitySpace =
+  | '#introductions'
+  | '#market-commentary'
+  | '#resources-library'
+  | '#events-calendar'
+  | '#peer-intros'
+  | '#job-board'
+  | '#tools-and-tech'
+  | '#general-chat'
+  | '#study-groups'
+  | '#alumni-network'
 
-export interface Company {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  industry: string;
-  address: string;
-  country: string;
-  state: string;
-  city: string;
-  website?: string;
-  workspaceName: string; // e.g. "abc" for abc.twincord.com
-  companySize: CompanySize;
-  createdDate: string;
-  userCount: number;
+// ─── Activity State ─────────────────────────────────────────────────────────
+export type ActivityState =
+  | 'Newly Joined'
+  | 'Active'
+  | 'Highly Active'
+  | 'At Risk'
+  | 'Dormant'
+
+// ─── Activity Event Types ────────────────────────────────────────────────────
+export type ActivityEventType =
+  | 'Post in channel'
+  | 'Reply / comment'
+  | 'Event RSVP'
+  | 'Event attended'
+  | 'Resource downloaded'
+  | 'Peer intro accepted'
+  | 'Welcome call'
+  | 'Poll responded'
+  | 'Direct message'
+  | 'Community call attended'
+
+// ─── Activity Event ──────────────────────────────────────────────────────────
+export interface ActivityEvent {
+  id: string
+  memberId: string
+  type: ActivityEventType
+  space: CommunitySpace
+  description: string
+  date: string // ISO date string
+  loggedBy: string // community manager name
+  commercialFlag?: boolean // ⚠️ Requires human review – never feeds activity score
+  commercialNote?: string  // Human-readable note about the commercial signal
 }
 
-export type LeadStatus = 'New' | 'Contacted' | 'Follow-up' | 'Closed' | 'Converted';
+// ─── Member ───────────────────────────────────────────────────────────────────
+export type MemberRole =
+  | 'Student'
+  | 'Graduate'
+  | 'Early Professional'
+  | 'Mid-career Professional'
+  | 'Senior Professional'
+  | 'Mentor'
+  | 'Alumni'
 
-export interface Lead {
-  id: string;
-  name: string;
-  companyName: string;
-  email: string;
-  phone: string;
-  status: LeadStatus;
-  assignedUserId?: string; // ID of the SALES_USER
-  assignedUserName?: string; // Name of the SALES_USER
-  companyId: string; // Tenant company ID
-  value: number; // Potential monetary value
-  createdDate: string;
-  updatedDate: string;
+export interface Member {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  joinDate: string          // ISO date string
+  role: MemberRole
+  primarySpace: CommunitySpace
+  interests: string[]
+  bio?: string
+  linkedIn?: string
+  ownerId?: string          // Community manager assigned as owner
+  ownerName?: string
+  nextAction?: string
+  nextActionDue?: string    // ISO date string
+  onboardingComplete?: boolean
+  welcomeCallDone?: boolean
+  notes?: string
+  avatarColor: string       // Tailwind bg color token for avatar
 }
 
-export interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  assignedUserId?: string;
-  assignedUserName?: string;
-  companyId: string;
-  createdDate: string;
+// ─── Computed member with state ───────────────────────────────────────────────
+export interface MemberWithState extends Member {
+  activityState: ActivityState
+  activityCount30d: number  // Events in last 30 days
+  lastActivityDate?: string
+  recentActivities: ActivityEvent[]
+  allActivities: ActivityEvent[]
 }
 
-export interface Note {
-  id: string;
-  leadId: string; // Matches Lead ID / Customer ID
-  authorName: string;
-  text: string;
-  timestamp: string;
+// ─── Follow-up item ───────────────────────────────────────────────────────────
+export interface FollowUpItem {
+  member: MemberWithState
+  reason: string
+  priority: 'High' | 'Medium' | 'Low'
+  daysSinceActivity?: number
+  daysUntilActionDue?: number
 }
 
-export interface Purchase {
-  id: string;
-  leadId: string; // Matches Lead ID / Customer ID
-  product: string;
-  amount: number;
-  date: string;
+// ─── AI Suggestion ────────────────────────────────────────────────────────────
+export type AISuggestionType =
+  | 'activity_summary'
+  | 'space_suggestion'
+  | 'peer_intro'
+  | 'activation_message'
+  | 'next_step'
+
+export interface AISuggestion {
+  type: AISuggestionType
+  label: string
+  content: string
+  disclaimer: string
 }

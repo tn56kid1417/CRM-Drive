@@ -1,66 +1,50 @@
 import { create } from 'zustand'
 import type { User } from '../types'
-import { api } from '../services/api'
 
 interface AuthState {
   user: User | null
-  token: string | null
   isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
-  login: (workspaceName: string, email: string, password: string) => Promise<User>
+  login: (email: string, password: string) => Promise<void>
   logout: () => void
-  clearError: () => void
 }
 
-export const useAuthStore = create<AuthState>((set) => {
-  // Load initial state from localStorage
-  const cachedUser = localStorage.getItem('crm_user')
-  const cachedToken = localStorage.getItem('crm_token')
+// Hardcoded community manager credentials (standalone, no backend)
+const VALID_USERS: { email: string; password: string; user: User }[] = [
+  {
+    email: 'priya@friendsoffinance.com',
+    password: 'fof2025',
+    user: { id: 'cm-1', name: 'Priya Mehta', email: 'priya@friendsoffinance.com', role: 'COMMUNITY_MANAGER' },
+  },
+  {
+    email: 'james@friendsoffinance.com',
+    password: 'fof2025',
+    user: { id: 'cm-2', name: 'James Okafor', email: 'james@friendsoffinance.com', role: 'COMMUNITY_MANAGER' },
+  },
+  {
+    email: 'sophie@friendsoffinance.com',
+    password: 'fof2025',
+    user: { id: 'cm-3', name: 'Sophie Laurent', email: 'sophie@friendsoffinance.com', role: 'COMMUNITY_MANAGER' },
+  },
+]
 
-  return {
-    user: cachedUser ? JSON.parse(cachedUser) : null,
-    token: cachedToken,
-    isAuthenticated: !!cachedToken,
-    isLoading: false,
-    error: null,
+const storedUser = localStorage.getItem('fof_user')
 
-    login: async (workspaceName, email, password) => {
-      set({ isLoading: true, error: null })
-      try {
-        const response = await api.post('/auth/login', { workspaceName, email, password })
-        const { user, token } = response.data
+export const useAuthStore = create<AuthState>()((set) => ({
+  user: storedUser ? JSON.parse(storedUser) : null,
+  isAuthenticated: !!storedUser,
 
-        localStorage.setItem('crm_token', token)
-        localStorage.setItem('crm_user', JSON.stringify(user))
+  login: async (email, password) => {
+    await new Promise((r) => setTimeout(r, 600)) // simulate async
+    const match = VALID_USERS.find(
+      (u) => u.email === email && u.password === password
+    )
+    if (!match) throw new Error('Invalid email or password')
+    localStorage.setItem('fof_user', JSON.stringify(match.user))
+    set({ user: match.user, isAuthenticated: true })
+  },
 
-        set({
-          user,
-          token,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        })
-        return user
-      } catch (err: any) {
-        const errMsg = err.data?.message || 'Login failed. Please check your credentials.'
-        set({ error: errMsg, isLoading: false })
-        throw new Error(errMsg)
-      }
-    },
-
-    logout: () => {
-      localStorage.removeItem('crm_token')
-      localStorage.removeItem('crm_user')
-      set({
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-      })
-    },
-
-    clearError: () => set({ error: null }),
-  }
-})
+  logout: () => {
+    localStorage.removeItem('fof_user')
+    set({ user: null, isAuthenticated: false })
+  },
+}))

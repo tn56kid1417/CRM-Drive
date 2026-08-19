@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LogOut, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react'
+import { LogOut, ChevronLeft, ChevronRight, Users } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { SIDEBAR_NAV } from '../constants/navigation'
-import { Badge } from './ui/Badge'
 import { cn } from '../utils/cn'
 
 export const Sidebar: React.FC = () => {
@@ -13,13 +12,6 @@ export const Sidebar: React.FC = () => {
 
   if (!user) return null
 
-  // Filter navigation items by user role
-  const filteredNav = SIDEBAR_NAV.filter(
-    (item) => !item.adminOnly || user.role === 'COMPANY_ADMIN'
-  )
-
-  const roleLabel = user.role === 'COMPANY_ADMIN' ? 'Company Admin' : 'Sales Rep'
-
   return (
     <aside
       className={cn(
@@ -28,20 +20,23 @@ export const Sidebar: React.FC = () => {
       )}
     >
       {/* Brand Header */}
-      <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50 h-16">
+      <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-gradient-to-r from-emerald-50 to-teal-50 h-16">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 bg-primary text-primary-foreground rounded-xl flex items-center justify-center flex-shrink-0">
-            <BarChart3 size={20} />
+          <div className="p-2 bg-emerald-600 text-white rounded-xl flex items-center justify-center flex-shrink-0">
+            <Users size={18} />
           </div>
           {!isCollapsed && (
-            <span className="font-extrabold text-base tracking-tight text-slate-800 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent truncate">
-              Twincord
-            </span>
+            <div className="overflow-hidden">
+              <span className="font-extrabold text-sm tracking-tight text-emerald-900 block truncate">
+                Friends of Finance
+              </span>
+              <span className="text-xs text-emerald-600 font-semibold">Community CRM</span>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Collapse Toggle Button */}
+      {/* Collapse Toggle */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="absolute -right-3 top-18 p-1 bg-white text-slate-600 border border-slate-200 rounded-full hover:bg-slate-50 cursor-pointer shadow-sm z-40 hidden md:block"
@@ -50,8 +45,8 @@ export const Sidebar: React.FC = () => {
       </button>
 
       {/* Nav List */}
-      <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-        {filteredNav.map((item) => {
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {SIDEBAR_NAV.map((item) => {
           const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/')
           const Icon = item.icon
 
@@ -62,16 +57,21 @@ export const Sidebar: React.FC = () => {
               className={cn(
                 'flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group relative',
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm hover:shadow-md'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
               )}
             >
-              <Icon size={18} className={cn('flex-shrink-0 transition-transform group-hover:scale-105', isActive ? 'text-current' : 'text-slate-400 group-hover:text-slate-600')} />
+              <Icon
+                size={18}
+                className={cn(
+                  'flex-shrink-0 transition-transform group-hover:scale-105',
+                  isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600'
+                )}
+              />
               {!isCollapsed && <span className="truncate">{item.name}</span>}
-              
-              {/* Tooltip for collapsed mode */}
+
               {isCollapsed && (
-                <div className="absolute left-full ml-4 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50">
+                <div className="absolute left-full ml-4 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
                   {item.name}
                 </div>
               )}
@@ -80,21 +80,16 @@ export const Sidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* Profile Section & Logout */}
+      {/* Profile + Logout */}
       <div className="p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
         <div className={cn('flex items-center gap-3', isCollapsed ? 'justify-center' : 'justify-start')}>
-          {/* Avatar Icon */}
-          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0 uppercase border border-primary/20">
+          <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm flex-shrink-0 border border-emerald-200">
             {user.name.charAt(0)}
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-slate-800 leading-tight truncate">{user.name}</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <Badge variant={user.role === 'COMPANY_ADMIN' ? 'primary' : 'success'} className="px-1.5 py-0 text-[9px] font-bold">
-                  {roleLabel}
-                </Badge>
-              </div>
+              <p className="text-xs text-slate-500">Community Manager</p>
             </div>
           )}
         </div>
@@ -102,15 +97,14 @@ export const Sidebar: React.FC = () => {
         <button
           onClick={logout}
           className={cn(
-            'flex items-center gap-3.5 w-full px-3.5 py-2.5 text-sm font-semibold text-danger/80 hover:bg-danger/10 hover:text-danger rounded-xl transition-all duration-200 group relative cursor-pointer',
+            'flex items-center gap-3.5 w-full px-3.5 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all duration-200 group relative cursor-pointer',
             isCollapsed && 'justify-center'
           )}
         >
           <LogOut size={18} className="flex-shrink-0 group-hover:-translate-x-0.5 transition-transform" />
           {!isCollapsed && <span>Log out</span>}
-
           {isCollapsed && (
-            <div className="absolute left-full ml-4 px-2 py-1 bg-danger text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50">
+            <div className="absolute left-full ml-4 px-2 py-1 bg-red-600 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
               Log out
             </div>
           )}
@@ -119,4 +113,5 @@ export const Sidebar: React.FC = () => {
     </aside>
   )
 }
+
 export default Sidebar

@@ -1,66 +1,60 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { ProtectedRoute } from './ProtectedRoute'
+import { useAuthStore } from '../store/authStore'
 
-// Layout wrappers
-import AuthLayout from '../layouts/AuthLayout'
+// Layouts
 import DashboardLayout from '../layouts/DashboardLayout'
+import AuthLayout from '../layouts/AuthLayout'
 
-// Public views
-import RegisterCompany from '../views/public/RegisterCompany'
+// FoF Views
+import Login from '../views/fof/Login'
+import Dashboard from '../views/fof/Dashboard'
+import Members from '../views/fof/Members'
+import MemberDetail from '../views/fof/MemberDetail'
+import FollowUp from '../views/fof/FollowUp'
+import NewMembers from '../views/fof/NewMembers'
+import HighlyActive from '../views/fof/HighlyActive'
+import AtRiskDormant from '../views/fof/AtRiskDormant'
+import Help from '../views/fof/Help'
 
-// Login View
-import Login from '../views/auth/Login'
-
-// Dispatchers
-import DashboardDispatcher from './DashboardDispatcher'
-import LeadsDispatcher from './LeadsDispatcher'
-
-// Protected Workspace Views
-import SalesUsers from '../views/company-admin/SalesUsers'
-import Customers from '../views/company-admin/Customers'
-import CustomerDetails from '../views/company-admin/CustomerDetails'
-import Reports from '../views/company-admin/Reports'
-import Settings from '../views/shared/Settings'
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuthStore()
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
+}
 
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/register" element={<RegisterCompany />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* AUTH SHELL (Centered cards) */}
+        {/* Auth */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
         </Route>
 
-        {/* PROTECTED WORKSPACE PORTAL (Sidebar layout) */}
-        <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN', 'SALES_USER']} />}>
-          <Route element={<DashboardLayout />}>
-            
-            {/* Common routes for both admin & sales reps */}
-            <Route path="/dashboard" element={<DashboardDispatcher />} />
-            <Route path="/leads" element={<LeadsDispatcher />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/customers/:id" element={<CustomerDetails />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
-
-            {/* Admin-only routes */}
-            <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN']} />}>
-              <Route path="/sales" element={<SalesUsers />} />
-            </Route>
-
-          </Route>
+        {/* Protected Dashboard */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/members" element={<Members />} />
+          <Route path="/members/:id" element={<MemberDetail />} />
+          <Route path="/follow-up" element={<FollowUp />} />
+          <Route path="/new-members" element={<NewMembers />} />
+          <Route path="/highly-active" element={<HighlyActive />} />
+          <Route path="/at-risk" element={<AtRiskDormant />} />
+          <Route path="/help" element={<Help />} />
         </Route>
 
-        {/* FALLBACK REDIRECTS */}
         <Route path="*" element={<Navigate to="/" replace />} />
-
       </Routes>
     </BrowserRouter>
   )
 }
+
 export default AppRouter

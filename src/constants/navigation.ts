@@ -1,43 +1,27 @@
-import { LayoutDashboard, Users, Target, Users2, FileText, Settings } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Users,
+  AlertTriangle,
+  Star,
+  UserPlus,
+  Bell,
+  HelpCircle,
+} from 'lucide-react'
 
 export interface NavItem {
   name: string
   href: string
   icon: any
-  adminOnly?: boolean // Hide from sales users
 }
 
 export const SIDEBAR_NAV: NavItem[] = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Sales Reps',
-    href: '/sales',
-    icon: Users,
-    adminOnly: true,
-  },
-  {
-    name: 'Leads Board',
-    href: '/leads',
-    icon: Target,
-  },
-  {
-    name: 'Customers',
-    href: '/customers',
-    icon: Users2,
-  },
-  {
-    name: 'Reports',
-    href: '/reports',
-    icon: FileText,
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: Settings,
-  },
+  { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'All Members', href: '/members', icon: Users },
+  { name: 'Follow-up Queue', href: '/follow-up', icon: Bell },
+  { name: 'New Members', href: '/new-members', icon: UserPlus },
+  { name: 'Highly Active', href: '/highly-active', icon: Star },
+  { name: 'At-Risk / Dormant', href: '/at-risk', icon: AlertTriangle },
+  { name: 'Help & Guide', href: '/help', icon: HelpCircle },
 ]
+
 export default SIDEBAR_NAV
