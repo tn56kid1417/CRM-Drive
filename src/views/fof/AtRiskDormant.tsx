@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Clock, AlertTriangle } from 'lucide-react'

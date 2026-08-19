@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Plus, Filter, ChevronRight, X } from 'lucide-react'

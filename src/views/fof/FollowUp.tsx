@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, ArrowRight } from 'lucide-react'

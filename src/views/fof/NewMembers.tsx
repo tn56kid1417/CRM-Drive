@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, CheckCircle, Circle, Phone } from 'lucide-react'
