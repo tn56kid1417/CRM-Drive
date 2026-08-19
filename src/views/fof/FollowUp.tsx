@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Clock, ArrowRight } from 'lucide-react'
+import { ChevronRight, ArrowRight } from 'lucide-react'
 import { useMemberStore } from '../../store/memberStore'
 
 const PRIORITY_BADGE: Record<string, string> = {

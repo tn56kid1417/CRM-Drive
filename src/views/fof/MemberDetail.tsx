@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
-  ArrowLeft, Edit2, Save, X, Plus, Activity, AlertTriangle, Sparkles,
+  ArrowLeft, Edit2, Save, X, Plus, Activity, Sparkles,
   Loader2, ExternalLink, CheckCircle, Circle,
 } from 'lucide-react'
 import { useMemberStore } from '../../store/memberStore'
